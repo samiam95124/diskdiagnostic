@@ -1,0 +1,4 @@
+#
+# Compile discdiag for linux
+#
+gcc -o discdiag discdiag.c linuxio.c -lrt
