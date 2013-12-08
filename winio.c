@@ -354,6 +354,8 @@ int physize(
  * Same as physize, but works on disks that are not opened.
  * Takes the number of the disk.
  *
+ * Note: does not print on error.
+ *
  * Returns 0 on succeed, 1 on fail.
  *
  */
@@ -388,8 +390,7 @@ int testsize(
                         &rsize, NULL);
     if (r == 0) {
 
-        printf("*** Error: Cannot get size of disk\n");
-        return 1;
+        return 1; // just return error
 
     }
 
