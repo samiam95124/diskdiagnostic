@@ -4369,7 +4369,7 @@ int main(int argc, char* argv[])
     double time;
     int error_result;
 
-    printf("Disc Diagnostic 2.0\n");
+    printf("Disc Diagnostic 2.0.1\n");
     printf("\n");
     printf("Enter ? or Help for command list\n");
     printf("\n");
