@@ -1,199 +1,255 @@
-//******************************************************************************
-//
-// Disc Drive diagnostic
-//
-// Operates on a Windows physical drive. Directly accesses sectors on the drive,
-// placing the sector contents in a buffer. Accesses the drive at the lowest
-// level, a Windows physical drive.
-//
-// The diagnostic maintains two buffers, one for reads and one for writes, which
-// hold a large number of sectors (currently 256, but configurable). The idea is
-// that you can set up patterns in the write buffer to be written out to disc,
-// then read sectors into the read buffer for check, comparision or examination.
-//
-// The diagnostic is CLI oriented, and is "minimally scriptable". This means
-// it supports multiple commands on a line, loops, variables, and other 
-// abilities. The emphasis was on simple commands, oriented entirely to disc
-// operations, and allowing as much to occur on a single command line as
-// possible.
-//
-// Commands available:
-// 
-// ?, help                     - Print command help.   
-// r, read [lba][num]          - Read sector(s) at LBA, default read 0 1.  
-// w, write [lba][num]         - Read sector(s) at LBA, default read 0 1.
-// dw, dumpwrite [num]         - Dump sector(s) from write buffer, default 1.   
-// dr, dumpread [num]          - Dump sector(s) from read buffer, default 1.   
-// pt, pattn [pat [val [cnt]]] - Set write buffer to pattern, default is count.  
-// c, comp [pat [val [cnt]]]   - Compare read buffer to pattern, default is count.  
-// cm, compmode mode           - Set miscompare handling mode.
-// drive [num]                 - Set current physical drive, default is print current. 
-// listdrives, ld              - List available physical drives. 
-// unprot                      - Unprotect current drive. 
-// echo [text]                 - Echo the parameter area with next line.   
-// echon [text]                - Echo the parameter area without next line.
-// p, print ["fmt"] val...     - Print a calulated value with next line.
-// pn, printn ["fmt"] val...   - Print a calulated value with NO next line.
-// l, loop [num]               - Loop from line start num times, default is forever.
-// lq, loopq [num]             - Loop quiet from line start num times, def. is for.
-// u [num]                     - Loop until condition is true.
-// while cond                  - Start while/wend loop. Exec loop if cond is true.
-// wend                        - Terminate while/wend loop.
-// repeat                      - Start repeat/until loop.
-// until cond                  - End repeat/until loop. Repeat if cond is false.
-// for var start end [step]    - Run for loop, start to end in var.             
-// fend                        - End for loop.
-// select val                  - Select value, match successive cases for val.
-// case val                    - Start new select case.
-// default                     - Start select case matching any value.
-// send                        - Terminate select statement.
-// if cond                     - Continue if condition met, otherwise next line.
-// go label                    - Go to program label.
-// end                         - Terminate procedure.
-// s, set var val              - Set/reset user variable.
-// local var                   - Mark variable as local.
-// srand                       - Reset random number sequence.
-// list                        - List stored program.
-// clear                       - Clear stored program.
-// save filename               - Save stored program to file.
-// load filename               - Load stored program from file.
-// delt num                    - Delete line in program with line number.
-// exit                        - Exit diagnostic.
-// exitonerror                 - Exit the diagnostic on error.
-// 
-// [option] Means an optional parameter.
-//
-// Multiple commands can appear on a line as a; b; c...
-// 
-// Patterns are:
-// 
-// cnt   - Byte incrementing count.
-// dwcnt - 32 bit incrementing count.
-// val   - Numeric 32 bit value, big endian.
-// rand  - Random byte value.
-// lba   - Only the first 32 bits get LBA, rest is $ff. LBA starts 
-//         at [val], and increments across buffer. Note that this only
-//         writes the first dword of each sector, use another pattern
-//         to fill the background.
-// buffs - Compare the read and write buffers to each other. This allows
-//         complex patterns to be built up in the write buffer.
-// 
-// All write operations are from the write buffer.
-// All read operations are from the read buffer.
-// 
-// All drives start write locked, and are relocked when the drive is changed.
-// 
-// User variables start with a-z and continue with a-z and 0-9 like Myvar1.
-// They are created or recreated by set, and can be set any number of times.
-// A variable can be used anywhere a val can.
-// 
-// There are several predefined variables:
-// 
-// drvsiz - Gives the size of the current physical drive.
-// rand   - Gives a random number.
-// lbarnd - Gives a random LBA for the current drive, ie., a random number
-//          that fits into 0..drvsiz-1.
-// secsiz - Size of sector in bytes (always 512).
-// bufsiz - Size of read and write buffers in sectors.
-//
-// The compare modes are:
-// 
-// all - Show all mismatches.
-// one - Show only the first mismatch.
-// fail - Fail (abort) after the first mismatch (normal is continue).
-//
-// All numeric parameters can be expressions, using C style expression operators
-// +a,-a,(a),a*b,a/b,a%b,a+b,a-b,a<b,a>b,a=b, a!=b,a<=b and a>b.
-// Note that expressions cannot contain spaces, ie., a numeric parameter cannot
-// have spaces within it.
-//
-// Format strings used with print must start and end with double quotes.
-// They can contain standard C style format specifiers like %[w[.p]f, where
-// the format character is d, x, or o, for decimal, hexadecimal or octal.
-// The sign and length cannot be specified, since debug values are always signed
-// long long values. Anything else in the format string is printed. There are
-// no character escapes, use pn/printn and p/print to specify or leave out a 
-// newline after printout.
-//
-// Note that leading zeros don't work in the field width. Use the precision 
-// instead, i.e., %4.4x not %04x.
-//
-// Stored program lines are entered with a leading number as:
-// 
-// Diag> 1 dothis(num): echon The number is: ; p num
-// 
-// The line is inserted BEFORE the line in the program.
-// 
-// Any line with a label (as \"dothis:\" above) can be called as a
-// procedure by using it's label as a command as:
-// 
-// Diag> dothis 42
-// 
-// Note parameters are optional.
-// 
-// Procedure execution stops with an \"end\" command, and execution
-// resumes after the calling command.
-// 
-// All variables created in a procedure are temporary and removed at
-// the end of the procedure. Variables are only created in a procedure
-// if they don't exist outside of the procedure OR if \"local\" is used.
-// Note that parameters are automatically local.
-// 
-// Note that hitting the end of the program buffer terminates the run
-// ALWAYS.
-// 
-// The file \"discdiag.ini\", if present in the current directory, is
-// automatically loaded when discdiag starts. If the file contains a
-// procedure "init", that will be executed automatically on startup.
-// 
-// *** WARNING: This diagnostic CAN and WILL distroy your hard disc!
-//
-// Typical operations:
-//
-// diag> s lba 0
-// diag> p lba; pt lba lba; w lba bufsiz; s lba lba+buzsiz; l 4096
-//
-// Writes the full drive with the "lba identify pattern", or the lba number as
-// the first 32 bits (big endian) of each sector. The lba is printed each time
-// through the loop. Note that "pt lba lba" means "pattern the write buffer with
-// the lba pattern, and use lba numbers starting with the value in the variable
-// lba". The first parameter of pt is the pattern name, the second is numeric/
-// expression. 4096 is 1 megasector divided by 256, the size of the buffer.
-//
-// diag> s lba 0
-// diag> p lba; r lba bufsiz; c lba lba; s lba lba+bufsiz; l 4096
-//
-// This verifies the lba pattern we just wrote.
-//
-// Bugs/wants/issues:
-//
-// 1. The calls used, readfile and writefile, hide errors from the drive. I know
-// it is possible to retrieve actual errors from the drive, iometer does it. It
-// would be far better if discdiag registered these errors (this may be a windows
-// only issue).
-//
-// Compilation:
-//
-// Windows:
-//
-// I struggled with trying to get a standalone image from Visual studio. It does
-// not work unless you carry the entire Visual studio environment to the target,
-// which is not real practical. Cygwin has similar problems. The best way I 
-// found is to get mingw and compile it:
-//
-// 1. Go to www.mingw.org and get the current mingw distribution. This will go
-//    to c:\mingw by default.
-//
-// 2. Execute "c:\mingw\gcc -o discdiag discdiag.c". This is also in the file
-//    cdiscdiag.bat.
-//
-// The result is .dll free and will run anywhere (yea).
-//
-// Linux:
-//
-// Compiles with the stock gcc compiler.
-// 
-//******************************************************************************
+/** ****************************************************************************
+*
+* \file
+*
+* \brief Disc Drive diagnostic
+*
+* Operates on a Windows physical drive. Directly accesses sectors on the drive,
+* placing the sector contents in a buffer. Accesses the drive at the lowest
+* level, a Windows physical drive.
+*
+* The diagnostic maintains two buffers, one for reads and one for writes, which
+* hold a large number of sectors (currently 256, but configurable). The idea is
+* that you can set up patterns in the write buffer to be written out to disc,
+* then read sectors into the read buffer for check, comparision or examination.
+*
+* The diagnostic is CLI oriented, and is "minimally scriptable". This means
+* it supports multiple commands on a line, loops, variables, and other 
+* abilities. The emphasis was on simple commands, oriented entirely to disc
+* operations, and allowing as much to occur on a single command line as
+* possible.
+*
+* Commands available:
+* 
+* ?, help                     - Print command help.
+*
+* r, read [lba][num]          - Read sector(s) at LBA, default read 0 1.  
+*
+* w, write [lba][num]         - Read sector(s) at LBA, default read 0 1.
+*
+* dw, dumpwrite [num]         - Dump sector(s) from write buffer, default 1.   
+*
+* dr, dumpread [num]          - Dump sector(s) from read buffer, default 1.   
+*
+* pt, pattn [pat [val [cnt]]] - Set write buffer to pattern, default is count.  
+*
+* c, comp [pat [val [cnt]]]   - Compare read buffer to pattern, default is count. 
+* 
+* cm, compmode mode           - Set miscompare handling mode.
+*
+* drive [num]                 - Set current physical drive, default is print current. 
+*
+* listdrives, ld              - List available physical drives. 
+*
+* unprot                      - Unprotect current drive. 
+*
+* echo [text]                 - Echo the parameter area with next line. 
+* 
+* echon [text]                - Echo the parameter area without next line.
+*
+* p, print ["fmt"] val...     - Print a calulated value with next line.
+*
+* pn, printn ["fmt"] val...   - Print a calulated value with NO next line.
+*
+* l, loop [num]               - Loop from line start num times, default is forever.
+*
+* lq, loopq [num]             - Loop quiet from line start num times, def. is for.
+*
+* u [num]                     - Loop until condition is true.
+*
+* while cond                  - Start while/wend loop. Exec loop if cond is true.
+*
+* wend                        - Terminate while/wend loop.
+*
+* repeat                      - Start repeat/until loop.
+*
+* until cond                  - End repeat/until loop. Repeat if cond is false.
+*
+* for var start end [step]    - Run for loop, start to end in var.  
+*           
+* fend                        - End for loop.
+*
+* select val                  - Select value, match successive cases for val.
+*
+* case val                    - Start new select case.
+*
+* default                     - Start select case matching any value.
+*
+* send                        - Terminate select statement.
+*
+* if cond                     - Continue if condition met, otherwise next line.
+*
+* go label                    - Go to program label.
+*
+* end                         - Terminate procedure.
+*
+* s, set var val              - Set/reset user variable.
+*
+* local var                   - Mark variable as local.
+*
+* srand                       - Reset random number sequence.
+*
+* list                        - List stored program.
+*
+* clear                       - Clear stored program.
+*
+* save filename               - Save stored program to file.
+*
+* load filename               - Load stored program from file.
+*
+* delt num                    - Delete line in program with line number.
+*
+* exit                        - Exit diagnostic.
+*
+* exitonerror                 - Exit the diagnostic on error.
+* 
+* [option] Means an optional parameter.
+*
+* Multiple commands can appear on a line as a; b; c...
+* 
+* Patterns are:
+* 
+* cnt   - Byte incrementing count.
+*
+* dwcnt - 32 bit incrementing count.
+*
+* val   - Numeric 32 bit value, big endian.
+*
+* rand  - Random byte value.
+*
+* lba   - Only the first 32 bits get LBA, rest is $ff. LBA starts 
+*         at [val], and increments across buffer. Note that this only
+*         writes the first dword of each sector, use another pattern
+*         to fill the background.
+*
+* buffs - Compare the read and write buffers to each other. This allows
+*         complex patterns to be built up in the write buffer.
+* 
+* All write operations are from the write buffer.
+*
+* All read operations are from the read buffer.
+* 
+* All drives start write locked, and are relocked when the drive is changed.
+* 
+* User variables start with a-z and continue with a-z and 0-9 like Myvar1.
+* They are created or recreated by set, and can be set any number of times.
+* A variable can be used anywhere a val can.
+* 
+* There are several predefined variables:
+* 
+* drvsiz - Gives the size of the current physical drive.
+*
+* rand   - Gives a random number.
+*
+* lbarnd - Gives a random LBA for the current drive, ie., a random number
+*          that fits into 0..drvsiz-1.
+*
+* secsiz - Size of sector in bytes (always 512).
+*
+* bufsiz - Size of read and write buffers in sectors.
+*
+* The compare modes are:
+* 
+* all - Show all mismatches.
+*
+* one - Show only the first mismatch.
+*
+* fail - Fail (abort) after the first mismatch (normal is continue).
+*
+* All numeric parameters can be expressions, using C style expression operators
+* +a,-a,(a),a*b,a/b,a%b,a+b,a-b,a<b,a>b,a=b, a!=b,a<=b and a>b.
+* Note that expressions cannot contain spaces, ie., a numeric parameter cannot
+* have spaces within it.
+*
+* Format strings used with print must start and end with double quotes.
+* They can contain standard C style format specifiers like %[w[.p]f, where
+* the format character is d, x, or o, for decimal, hexadecimal or octal.
+* The sign and length cannot be specified, since debug values are always signed
+* long long values. Anything else in the format string is printed. There are
+* no character escapes, use pn/printn and p/print to specify or leave out a 
+* newline after printout.
+*
+* Note that leading zeros don't work in the field width. Use the precision 
+* instead, i.e., %4.4x not %04x.
+*
+* Stored program lines are entered with a leading number as:
+* 
+* Diag> 1 dothis(num): echon The number is: ; p num
+* 
+* The line is inserted BEFORE the line in the program.
+* 
+* Any line with a label (as \"dothis:\" above) can be called as a
+* procedure by using it's label as a command as:
+* 
+* Diag> dothis 42
+* 
+* Note parameters are optional.
+* 
+* Procedure execution stops with an \"end\" command, and execution
+* resumes after the calling command.
+* 
+* All variables created in a procedure are temporary and removed at
+* the end of the procedure. Variables are only created in a procedure
+* if they don't exist outside of the procedure OR if \"local\" is used.
+* Note that parameters are automatically local.
+* 
+* Note that hitting the end of the program buffer terminates the run
+* ALWAYS.
+* 
+* The file \"discdiag.ini\", if present in the current directory, is
+* automatically loaded when discdiag starts. If the file contains a
+* procedure "init", that will be executed automatically on startup.
+* 
+* *** WARNING: This diagnostic CAN and WILL distroy your hard disc!
+*
+* Typical operations:
+*
+* diag> s lba 0
+*
+* diag> p lba; pt lba lba; w lba bufsiz; s lba lba+buzsiz; l 4096
+*
+* Writes the full drive with the "lba identify pattern", or the lba number as
+* the first 32 bits (big endian) of each sector. The lba is printed each time
+* through the loop. Note that "pt lba lba" means "pattern the write buffer with
+* the lba pattern, and use lba numbers starting with the value in the variable
+* lba". The first parameter of pt is the pattern name, the second is numeric/
+* expression. 4096 is 1 megasector divided by 256, the size of the buffer.
+*
+* diag> s lba 0
+*
+* diag> p lba; r lba bufsiz; c lba lba; s lba lba+bufsiz; l 4096
+*
+* This verifies the lba pattern we just wrote.
+*
+* Bugs/wants/issues:
+*
+* 1. The calls used, readfile and writefile, hide errors from the drive. I know
+* it is possible to retrieve actual errors from the drive, iometer does it. It
+* would be far better if discdiag registered these errors (this may be a windows
+* only issue).
+*
+* Compilation:
+*
+* Windows:
+*
+* I struggled with trying to get a standalone image from Visual studio. It does
+* not work unless you carry the entire Visual studio environment to the target,
+* which is not real practical. Cygwin has similar problems. The best way I 
+* found is to get mingw and compile it:
+*
+* 1. Go to www.mingw.org and get the current mingw distribution. This will go
+*    to c:\mingw by default.
+*
+* 2. Execute "c:\mingw\gcc -o discdiag discdiag.c". This is also in the file
+*    cdiscdiag.bat.
+*
+* The result is .dll free and will run anywhere (yea).
+*
+* Linux:
+*
+* Compiles with the stock gcc compiler.
+* 
+******************************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -332,12 +388,13 @@ typedef enum {
 
 } compmode;
 
-compmode curmode; // compare mode
-int first; // first miscompare flag
-unsigned char comp_a, comp_b; // repeat compare values
-int repcnt; // repeat count
-int dataset; // data was set to above (comp_a, comp_b)
-int exiterror; // exit diagnostic on error
+/** Compare mode */                                        compmode curmode;
+/** First miscompare flag */                               int first;
+/** Repeat compare value */                                unsigned char comp_a; 
+/** Repeat compare value */                                unsigned char comp_b; 
+/** Repeat count */                                         int repcnt; 
+/** Data that was set to compare values (comp_a, comp_b) */ int dataset; 
+/** Exit diagnostic on error */                             int exiterror; 
 
 /**
  *
@@ -364,10 +421,11 @@ typedef enum {
 
 /**
  *
- * Command table
+ * Command definition structure
+ *
+ * Gives the name and what function to execute for each command.
  *
  */
-
 typedef struct _command {
 
     /** Command verb string */ char *cmdstr;
@@ -375,6 +433,11 @@ typedef struct _command {
 
 } command;
 
+/*
+ *
+ * Command routine declarations
+ *
+ */
 result command_help(char **line);
 result command_read(char **line);
 result command_write(char **line);
@@ -419,6 +482,14 @@ result command_listvariables(char **line);
 result command_exit(char **line);
 result command_exitonerror(char **line);
 
+/**
+ *
+ * Command table
+ *
+ * Gives each name and associated function for commands. Terminated by a dummy
+ * entry with both null string and function.
+ *
+ */
 command cmdtbl[] = {
 
     /** Help                 */      { "?",             command_help },
@@ -486,6 +557,29 @@ command cmdtbl[] = {
 
 };
 
+/*
+ * Variable handler definitions
+ */
+result variable_drvsiz(char **line, long long *ul);
+result variable_rand(char **line, long long *ul);
+result variable_lbarnd(char **line, long long *ul);
+result variable_secsiz(char **line, long long *ul);
+result variable_bufsiz(char **line, long long *ul);
+
+/**
+ *
+ * Structure of a variable handler
+ *
+ * Gives the name and function hander for each variable.
+ *
+ */
+typedef struct _variable {
+
+    /** Variable name string */ char *varstr;
+    /** Variable to execute */  result (*var)(char **line, long long *ll);
+
+} variable;
+
 /**
  *
  * Variable table
@@ -497,20 +591,6 @@ command cmdtbl[] = {
  * Variables also take a pointer to an unsigned long as the variable result.
  *
  */
-
-typedef struct _variable {
-
-    /** Variable name string */ char *varstr;
-    /** Variable to execute */  result (*var)(char **line, long long *ll);
-
-} variable;
-
-result variable_drvsiz(char **line, long long *ul);
-result variable_rand(char **line, long long *ul);
-result variable_lbarnd(char **line, long long *ul);
-result variable_secsiz(char **line, long long *ul);
-result variable_bufsiz(char **line, long long *ul);
-
 variable vartbl[] = {
 
     /** Drive size                            */ { "drvsiz", variable_drvsiz },
@@ -525,7 +605,7 @@ variable vartbl[] = {
 
 /**
  *
- * User defined variables
+ * User defined variable structure
  *
  * User defined variables are just a name and a value. They can be both read and
  * written.
@@ -540,7 +620,7 @@ typedef struct _uservar {
 
 } uservar;
 
-/** root of user variables list */
+/** Root of user variables list */
 uservar *varroot;
 
 /**
@@ -556,7 +636,6 @@ typedef struct _loopcounter {
 
 } loopcounter;
     
-
 /**
  *
  * Structure to hold stored text lines
@@ -590,16 +669,13 @@ typedef struct _intstk {
 
 } intstk;
 
-/** root of interpreter stack */
+/** Root of interpreter stack */
 
 intstk *introot;
 
 /**
  *
- * Control stack entries
- *
- * Controls are non-trivial controls that span multiple lines, like while/wend
- * and repeat/until.
+ * Control stack entry types.
  *
  */
 typedef enum {
@@ -610,6 +686,14 @@ typedef enum {
 
 } ctltyp;
 
+/**
+ *
+ * Control stack entries
+ *
+ * Controls are non-trivial controls that span multiple lines, like while/wend
+ * and repeat/until.
+ *
+ */
 typedef struct _ctlstk {
 
     /** next entry */         struct _ctlstk *next;
@@ -638,13 +722,14 @@ Support routines
  * Gets a text line from the given file into the buffer with length.
  * Any line ending is removed from the buffer.
  *
- * Returns true on eof, otherwise false
+ * \returns true on eof, otherwise false
  *
  */
 
-int readline(/** file to read from */ FILE *fp, 
-            /** buffer for string */ char *buff,
-            /** size of buffer    */ int size
+int readline(
+    /** File to read from */ FILE *fp, 
+    /** Buffer for string */ char *buff,
+    /** Size of buffer    */ int size
 )
 
 {
@@ -680,31 +765,44 @@ int readline(/** file to read from */ FILE *fp,
 
 }
 
-unsigned long seed = 1; 
-unsigned long mlcg,p,q; 
-unsigned long long tmpseed; 
+/** Seed for random number generator */ unsigned long seed = 1; 
 
 /**
  *
- * Return the next 32 bit random number 
+ * Return the next 32 bit random number
+ * 
+ * \returns 32 bit random number 
  *
  */ 
 unsigned long rand32() { 
  
-  tmpseed =  (unsigned long long)33614U * (unsigned long long)seed; 
-  q = (unsigned long) tmpseed;  /* low */ 
-  q = q >> 1; 
-  p = tmpseed >> 32 ;           /* hi */ 
-  mlcg = p + q; 
-  if (mlcg & 0x80000000) {  
-    mlcg = mlcg & 0x7FFFFFFF; 
-    mlcg++; 
-  } 
-  seed = mlcg; 
+    unsigned long long tmpseed;
+    unsigned long mlcg,p,q;
+    
+    tmpseed =  (unsigned long long)33614U * (unsigned long long)seed; 
+    q = (unsigned long) tmpseed;  /* low */ 
+    q = q >> 1; 
+    p = tmpseed >> 32 ;           /* hi */ 
+    mlcg = p + q; 
+    if (mlcg & 0x80000000) {
+    
+        mlcg = mlcg & 0x7FFFFFFF; 
+        mlcg++; 
+  
+    } 
+    seed = mlcg; 
  
-  return mlcg;  
+    return mlcg;
+    
 } 
 
+/**
+ *
+ * Return the next 64 bit random number
+ *
+ * \returns 64 bit random number
+ *
+ */ 
 long long rand64() {
 
     return (((long long) rand32() & 0x7fffffff) << 32) | rand32();
@@ -741,11 +839,13 @@ void pause(void)
  *
  * Dumps the given buffer in hex and ASCII
  *
+ * \returns Standard discdiag error code.
+ *
  */
 
 result dump(
-    /* buffer to dump */ unsigned char *buffer,
-    /* size of buffer */ long long size
+    /* Buffer to dump */ unsigned char *buffer,
+    /* Size of buffer */ long long size
 )
 
 {
@@ -807,7 +907,7 @@ result dump(
  */
 
 void printscaled(
-    /** number to print */ double n
+    /** Number to print */ double n
 )
 
 {
@@ -831,9 +931,9 @@ void printscaled(
  */
 
 void printscpersec(
-    /** label to print */ char labl[],
-    /** number */         double n,
-    /** time */           double time
+    /** Label to print */ char labl[],
+    /** Number */         double n,
+    /** Time */           double time
 )
 
 {
@@ -900,6 +1000,8 @@ void listvar(void)
  * Searches for a user variable by name. Returns a pointer to the variable
  * entry or NULL if not found.
  *
+ * \returns User variable entry.
+ *
  */
 uservar *fndvar(
     /** Name of user variable */ char *name
@@ -935,6 +1037,8 @@ uservar *fndvar(
  * Creates and pushes a new variable on the variables stack with the given name
  * and value.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result pushvar(
     /** Name of variable */ char *name,
@@ -972,10 +1076,12 @@ result pushvar(
  *
  * Gets a number off the command line. If no number is found, returns -1.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result getval(
     /** Line to parse */      char **l,
-    /** number returned */    long long *n
+    /** Number returned */    long long *n
 )
 
 {
@@ -1047,13 +1153,17 @@ result getparam(char **l, long long *n);
  * Processes factor. The factors are:
  *
  * +a
+ *
  * -a
+ *
  * (a)
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result getfact(
     /** Line to parse */   char **l,
-    /** number returned */ long long *n
+    /** Number returned */ long long *n
 )
 
 {
@@ -1108,13 +1218,17 @@ result getfact(
  * Processes a multiply or divide. The expressions are:
  *
  * a * b
+ *
  * a / b
+ *
  * a % b
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result getmult(
     /** Line to parse */   char **l,
-    /** number returned */ long long *n
+    /** Number returned */ long long *n
 )
 
 {
@@ -1177,12 +1291,15 @@ result getmult(
  * Processes an add or subtract. The expressions are:
  *
  * a + b
+ *
  * a - b
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result getadd(
     /** Line to parse */   char **l,
-    /** number returned */ long long *n
+    /** Number returned */ long long *n
 )
 
 {
@@ -1224,16 +1341,23 @@ result getadd(
  * Processes parameter expressions. The expressions are:
  *
  * a > b
+ *
  * a < b
+ *
  * a = b
+ *
  * a != b
+ *
  * a >= b
+ *
  * a <= b
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result getparam(
     /** Line to parse */      char **l,
-    /** number returned */    long long *n
+    /** Number returned */    long long *n
 )
 
 {
@@ -1316,6 +1440,8 @@ result getparam(
  *
  * Accepts two byte values, and prints out if they miscompare.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result printcomp(
     /** Buffer address */      long addr,
@@ -1382,6 +1508,8 @@ result printcomp(
  * correct thing. In any case, a line with a leading number is not a valid
  * command.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result enterline(char *line)
 
@@ -1542,6 +1670,8 @@ void clrpgm(void)
  *
  * Loads a program from a given file. Returns 0 for success.
  *
+ * \returns 0 if the file loaded, otherwise 1.
+ *
  */
 
 int loadfile(
@@ -1580,8 +1710,8 @@ int loadfile(
  *
  */
 void pushlvl(
-    /** current line buffer */ linestr *line,
-    /** current character position within buffer */ char *cpos
+    /** Current line buffer */ linestr *line,
+    /** Current character position within buffer */ char *cpos
 )
 
 {
@@ -1647,6 +1777,8 @@ void poplvl(void)
  * Searches for a label in the program store using the given name, and returns
  * that if found, otherwise NULL.
  *
+ * \returns The label string.
+ *
  */
 linestr *fndpgm(
     /** Name of user variable */ char *name
@@ -1683,14 +1815,17 @@ linestr *fndpgm(
  * is passed. That is, each loop command will have a unique place on the command
  * line, and the counter for it is filed using that position.
  *
+ * \returns The loopcounter entry.
+ *
  */
-loopcounter* fndcnt( /** root of counter list */       loopcounter** list,
-                     /** character position of loop */ char* pos)
+loopcounter* fndcnt(
+    /** Root of counter list */       loopcounter** list,
+    /** Character position of loop */ char* pos)
 
 {
 
-    /** loopcounter list pointer */  loopcounter *p; 
-    /** loopcounter found pointer */ loopcounter *f; 
+    /* loopcounter list pointer */  loopcounter *p; 
+    /* loopcounter found pointer */ loopcounter *f; 
 
     f = NULL; // set no entry found
     p = *list; // index top of list
@@ -1755,7 +1890,7 @@ void rstlin(void)
  *
  * Pop control level
  *
- * removes and frees one control level
+ * Removes and frees one control level
  *
  */
 void popctl(void)
@@ -1783,13 +1918,15 @@ void popctl(void)
  * end of a command, which means that the next ';' command separator or end
  * of line is to be found, then the commands after that examined.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result skipcmd(
-    /** remaining command line */ char **line,
-    /** command to skip */        char *cmd,
-    /** command to skip 2 */      char *cmd2,
-    /** command to skip 3 */      char *cmd3,
-    /** what label was found */   int  *fnd
+    /** Remaining command line */ char **line,
+    /** Command to skip */        char *cmd,
+    /** Command to skip 2 */      char *cmd2,
+    /** Command to skip 3 */      char *cmd3,
+    /** What label was found */   int  *fnd
 )
 
 {
@@ -1875,6 +2012,8 @@ Variable handlers
  *
  * Return current size of drive
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result variable_drvsiz(
@@ -1902,6 +2041,8 @@ result variable_drvsiz(
  * Note that this is currently a 32 bit implementation, we need to extend
  * to 64 bits. This is required to handle larger drives.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result variable_rand(
@@ -1923,6 +2064,8 @@ result variable_rand(
  *
  * Returns a random number limited to the LBA size
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result variable_lbarnd(
@@ -1952,6 +2095,8 @@ result variable_lbarnd(
  * Returns the sector size. This is pretty much set at 512 since the dawn of
  * fire.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result variable_secsiz(
@@ -1975,6 +2120,8 @@ result variable_secsiz(
  *
  * Returns the size, in sectors, of both the read and the write buffer.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result variable_bufsiz(
@@ -2004,10 +2151,12 @@ Command handlers
  *
  * Print command menu.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_help(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2157,10 +2306,12 @@ result command_help(
  *
  * Read sector to buffer
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_read(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2245,10 +2396,12 @@ result command_read(
  *
  * Write sector from buffer
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_write(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2338,10 +2491,12 @@ result command_write(
  *
  * Dump sectors in write buffer.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_dumpwrite(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2383,10 +2538,12 @@ result command_dumpwrite(
  *
  * Dump sectors in read buffer.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_dumpread(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2444,10 +2601,12 @@ result command_dumpread(
  * The type is the name of the pattern from above. The val is numeric and
  * is only used for the val and lba patterns, and ignored otherwise.
  * 
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_pattn(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2587,10 +2746,12 @@ result command_pattn(
  * by pattn exists in the buffer, and verifies in the read buffer instead of
  * the write buffer.
  * 
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_comp(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2849,10 +3010,12 @@ result command_comp(
  *
  * Note that the first two modes do not stop the program.
  * 
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_compmode(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2883,10 +3046,12 @@ result command_compmode(
  * to "on" by default. Also outputs a warning for accesses of the 0 drive, which
  * is generally the system drive.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_drive(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2943,10 +3108,12 @@ result command_drive(
  *
  * Lists what physical drives are currently available.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_listdrives(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -2986,10 +3153,12 @@ result command_listdrives(
  * the system drives, so this flag gets set on at the start, and anytime we
  * change drives.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_unprot(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3012,10 +3181,12 @@ result command_unprot(
  * the system drives, so this flag gets set on at the start, and anytime we
  * change drives.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_echon(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3040,10 +3211,12 @@ result command_echon(
  * the system drives, so this flag gets set on at the start, and anytime we
  * change drives.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_echo(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3072,10 +3245,12 @@ result command_echo(
  * The loop is done by simply reseting the parsing to the start of the command
  * line. The count is printed.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_loop(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3129,10 +3304,12 @@ result command_loop(
  * The loop is done by simply reseting the parsing to the start of the command
  * line. The count is NOT printed.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_loopq(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3183,10 +3360,12 @@ result command_loopq(
  * If the value is true, the loop stops, otherwise the command line is 
  * restarted.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_untill(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3216,10 +3395,12 @@ result command_untill(
  *
  * Loop until the given condition is true.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_while(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3261,10 +3442,12 @@ result command_while(
  *
  * Note we only hit the wend if the original while loop executed the body.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_wend(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3317,10 +3500,12 @@ result command_wend(
  *
  * Marks the beginning of a repeat block.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_repeat(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3346,10 +3531,12 @@ result command_repeat(
  * Ends a repeat block. Evaluates a condition, and goes back to the repeat
  * start if true.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_until(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3392,9 +3579,11 @@ result command_until(
  * equal to the end value. If so, the loop body is run, otherwise we skip
  * to the next fend command.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_for(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3469,9 +3658,11 @@ result command_for(
  * less than or equal to the end value. If so, we return to the top and go
  * again, otherwise the loop is exited.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_fend(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3534,9 +3725,11 @@ result command_fend(
  * The value is picked up and matched to all case statement values seen.
  * If the send command is seen, we terminate.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_select(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3578,9 +3771,11 @@ result command_select(
  * alone simply marks the end of a case sequence. We advance to the next send
  * and resume.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_case(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3604,9 +3799,11 @@ result command_case(
  * seen alone simply marks the end of a case sequence. We advance to the next 
  * send and resume.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_default(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3629,9 +3826,11 @@ result command_default(
  * Since the select command runs the select operation, a send just marks the end
  * of the select series. Thus it is effectively a no-op.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 result command_send(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3646,10 +3845,12 @@ result command_send(
  *
  * Prints any value or variable.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_printn(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3752,10 +3953,12 @@ result command_printn(
  *
  * Prints any value or variable with trailing newline.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_print(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3778,10 +3981,12 @@ result command_print(
  *
  * Sets either a new user variable or resets an existing one.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_set(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3826,10 +4031,12 @@ result command_set(
  * in the same procedure, or even if we are in procedure. THat result would not
  * be useful, but does no harm.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_local(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3852,10 +4059,12 @@ result command_local(
  * Resets the random number generator to its starting sequence, which is by
  * default a seen of 1.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_srand(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3872,10 +4081,12 @@ result command_srand(
  *
  * Lists the program store with line numbers.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_list(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3933,10 +4144,12 @@ result command_list(
  *
  * Clears the program store back to free storage.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_clear(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -3953,10 +4166,12 @@ result command_clear(
  *
  * Save the current program to a file.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_save(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4001,10 +4216,12 @@ result command_save(
  *
  * Loads a program from a given file.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_load(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4031,10 +4248,12 @@ result command_load(
  *
  * Deletes a single program line by number.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_delt(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4078,10 +4297,12 @@ result command_delt(
  *
  * Backs out a level from the interpreter.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_end(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4107,10 +4328,12 @@ result command_end(
  *
  * Transfers execution to the given label.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_go(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4153,10 +4376,12 @@ result command_go(
  *
  * Aborts the execution of the rest of the line if the condition is not met.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_if(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4183,10 +4408,12 @@ result command_if(
  * Does a simple bin test of the random number generator to validate it.
  * This is an "undocumented" command only valuable to test the diagnostic.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_testrand(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4227,10 +4454,12 @@ result command_testrand(
  *
  * Lists out the variables stack, this is a diagnostic.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_listvariables(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4249,10 +4478,12 @@ result command_listvariables(
  *
  * Exits the program.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_exit(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4269,10 +4500,12 @@ result command_exit(
  * to return interactive entry on error. However, for files that are to be run
  * entirely via batch, it may be needed to exit with the error.
  *
+ * \returns Standard discdiag error code.
+ * 
  */
 
 result command_exitonerror(
-    /** remaining command line */ char **line
+    /** Remaining command line */ char **line
 )
 
 {
@@ -4289,8 +4522,12 @@ result command_exitonerror(
  *                       
  * Executes a command on the passed line.
  *
+ * \returns Standard discdiag error code.
+ *
  */
-result exec(char **line)
+result exec(
+    /** Remaining command line */ char **line
+)
 
 {
 
@@ -4354,7 +4591,17 @@ result exec(char **line)
 
 }
 
-int main(int argc, char* argv[])
+/*
+ * Main function
+ *
+ * Set up and run the diagnostic interpreter.
+ *
+ * \returns Non-zero on error.
+ * 
+ */
+int main(
+    /** Number of arguments */ int argc, 
+    /** Argument array */      char* argv[])
 {
 
     char *linep; // Current position in line
