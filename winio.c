@@ -372,6 +372,7 @@ int testsize(
 
     HANDLE driveh;
 
+//printf("testsize: begin\n");
     //open the physical disk
     driveh = CreateFile(phystr[drive],
                      GENERIC_READ | GENERIC_WRITE,
@@ -383,13 +384,16 @@ int testsize(
                      0,
                      NULL);
 
+//printf("testsize: 1\n");
     if (driveh == INVALID_HANDLE_VALUE) return 1;
 
     // get size of disk
     r = DeviceIoControl(driveh, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &li, sizeof(li), 
                         &rsize, NULL);
+//printf("testsize: 2\n");
     if (r == 0) {
 
+//printf("testsize: 3\n");
         return 1; // just return error
 
     }
@@ -399,6 +403,7 @@ int testsize(
 
     //close the disk
     CloseHandle(driveh);
+//printf("testsize: end\n");
 
     return 0;
 
