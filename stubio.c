@@ -27,8 +27,6 @@
 *
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
-* chkbrk      - check user break
-*
 * gettim      - Get high resolution (64 bit) timer
 *
 * elapsed     - Find elapsed time
@@ -53,7 +51,6 @@ int physize(long long *size);
 int testsize(int drive, long long *size);
 void closedrive(void);
 const char* getdrvstr(int drive);
-int chkbrk(void);
 long long gettim(void);
 double elapsed(long long t);
 void initio(void);
@@ -323,22 +320,6 @@ const char* getdrvstr(int drive)
     if (drive >= 0 || drive <= 9) p = phystr[drive];
 
     return p;
-
-}
-
-/**
- *
- * Check user break
- *
- * Check if a user break occurred. Returns true if so.
- */
-int chkbrk(void)
-
-{
-
-    // Not implemented
-    // (typically this means that CTL-C can be used to break in anywhere)
-    return 0;
 
 }
 

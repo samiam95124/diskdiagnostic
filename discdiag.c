@@ -257,6 +257,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <signal.h>
 #include "discio.h"
 
 #include <time.h>
@@ -267,6 +268,15 @@
  *
  */
 #define LINES 24
+
+/**
+ *
+ * Break flag
+ *
+ * Indicates ctl-c was hit on the console.
+ *
+ */
+static int breakflag;
 
 /**
  *
@@ -716,6 +726,45 @@ ctlstk *ctlroot;
 Support routines
 
 *******************************************************************************/
+
+/**
+ *
+ * Capture ctrl-c
+ *
+ * Turns a control-c press into a flag, which can then be checked by various
+ * routines.
+ *
+ */
+void ctlchandler(int sig)
+
+{
+
+    signal(SIGINT, ctlchandler);
+    signal(SIGABRT, ctlchandler);
+
+    breakflag = 1; // set break occurred
+
+}
+
+/**
+ *
+ * Check user break
+ *
+ * Check if a user break occurred. Returns true if so.
+ */
+int chkbrk(void)
+
+{
+
+    int breakflags; // save for break flag
+
+    breakflags = breakflag; // save contents of break flag
+
+    breakflag = 0; // clear any break
+
+    return breakflags; // return state of user break
+
+}
 
 /**
  *
@@ -4627,6 +4676,19 @@ int main(
     // Initialize the external I/O package
     // 
     initio();
+    //
+    // Set up ctl-c handler. We don't check if it fails, this would simply mean
+    // that the old mode, break out of program, is in effect.
+    //
+    // Note you will want to comment this out for debugging, since it removes
+    // your ability to stop the program if it hangs.
+    //
+    breakflag = 0; // clear any break
+    signal(SIGINT, ctlchandler);
+    signal(SIGABRT, ctlchandler);
+    //
+    // Set up other globals
+    //
     currentdrive = -1; // set no drive active
     writeprot = 1; // set write protect by default
     curmode = compmode_one; // set to compare one by default

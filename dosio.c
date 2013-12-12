@@ -23,8 +23,6 @@
 *
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
-* chkbrk      - check user break
-*
 * gettim      - Get high resolution (64 bit) timer
 *
 * elapsed     - Find elapsed time
@@ -34,7 +32,6 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <signal.h>
 #include <time.h>
 #include "discio.h"
 
@@ -52,7 +49,6 @@ int physize(long long *size);
 int testsize(int drive, long long *size);
 void closedrive(void);
 const char* getdrvstr(int drive);
-int chkbrk(void);
 long long gettim(void);
 double elapsed(long long t);
 void initio(void);
@@ -93,15 +89,6 @@ char* phystr[10] = {
  *
  */
 static int phydrive;
-
-/**
- *
- * Break flag
- *
- * Indicates ctl-c was hit on the console.
- *
- */
-static int breakflag;
 
 /**
  *
@@ -492,45 +479,6 @@ const char* getdrvstr(int drive)
 
 /**
  *
- * Capture ctrl-c
- *
- * Turns a control-c press into a flag, which can then be checked by various
- * routines.
- *
- */
-void ctlchandler(int sig)
-
-{
-
-    signal(SIGINT, ctlchandler);
-    signal(SIGABRT, ctlchandler);
-
-    breakflag = 1; // set break occurred
-
-}
-
-/**
- *
- * Check user break
- *
- * Check if a user break occurred. Returns true if so.
- */
-int chkbrk(void)
-
-{
-
-    int breakflags; // save for break flag
-
-    breakflags = breakflag; // save contents of break flag
-
-    breakflag = 0; // clear any break
-
-    return breakflags; // return state of user break
-
-}
-
-/**
- *
  * Get high resolution timer
  *
  * Get current setting on high resolution timer.
@@ -585,17 +533,6 @@ void initio(void)
     printf("\n");
 
     phydrive = -1; // set no drive is active
-
-    //
-    // Set up ctl-c handler. We don't check if it fails, this would simply mean
-    // that the old mode, break out of program, is in effect.
-    //
-    // Note you will want to comment this out for debugging, since it removes
-    // your ability to stop the program if it hangs.
-    //
-    breakflag = 0; // clear any break
-    signal(SIGINT, ctlchandler);
-    signal(SIGABRT, ctlchandler);
 
 }
  
