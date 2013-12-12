@@ -2,7 +2,7 @@
 *
 * \file
 *
-* \brief Disc Drive diagnostic
+* \mainpage Disc Drive Diagnostic
 *
 * Operates on a Windows physical drive. Directly accesses sectors on the drive,
 * placing the sector contents in a buffer. Accesses the drive at the lowest
