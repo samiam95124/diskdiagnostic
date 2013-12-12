@@ -2,6 +2,8 @@
 *
 * \file
 *
+* \brief This file contains the main diagnostic code
+*
 * \mainpage Disc Drive Diagnostic
 *
 * Operates on a Windows physical drive. Directly accesses sectors on the drive,
