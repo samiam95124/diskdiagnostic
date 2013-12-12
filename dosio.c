@@ -1,33 +1,44 @@
-//******************************************************************************
-//
-// Disc Drive diagnostic
-//
-// DOS I/O module
-//
-// Contains DOS specific I/O functions.
-//
-// setdrive    - Set current physical access drive (and open it).
-// getdrive    - Get the current logical drive number.
-// readsector  - Read one or more sectors to a buffer.
-// writesector - Write one or more sectors to a buffer.
-// physize     - Get the size of the physical drive in lbas.
-// testsize    - Get the size of a physical drive in lbas, but takes drive as
-//               parameter.
-// closedrive  - Close current drive.
-// getdrvstr   - Gets the string corresponding to a given logical drive.
-// chkbrk      - check user break
-// gettim      - Get high resolution (64 bit) timer
-// elapsed     - Find elapsed time
-// initio      - Initializes this module
-// 
-//******************************************************************************
+/** ***************************************************************************
+*
+* \file
+*
+* \brief DOS I/O module
+*
+* Contains DOS specific I/O functions.
+*
+* setdrive    - Set current physical access drive (and open it).
+*
+* getdrive    - Get the current logical drive number.
+*
+* readsector  - Read one or more sectors to a buffer.
+*
+* writesector - Write one or more sectors to a buffer.
+*
+* physize     - Get the size of the physical drive in lbas.
+*
+* testsize    - Get the size of a physical drive in lbas, but takes drive as
+*               parameter.
+*
+* closedrive  - Close current drive.
+*
+* getdrvstr   - Gets the string corresponding to a given logical drive.
+*
+* chkbrk      - check user break
+*
+* gettim      - Get high resolution (64 bit) timer
+*
+* elapsed     - Find elapsed time
+*
+* initio      - Initializes this module
+* 
+******************************************************************************/
 
 #include <stdio.h>
 #include <signal.h>
 #include <time.h>
 #include "discio.h"
 
-/**
+/*
  *
  * Exported functons declarations
  *
@@ -173,7 +184,7 @@ static unsigned char probestatus(
  *
  */
 int setdrive(
-    /** drive number to set */ int drive
+    /** Drive number to set */ int drive
 )
 
 {
@@ -541,7 +552,7 @@ long long gettim(void)
  *
  * Find elapsed time in seconds
  *
- * Finds the elapsed time in second. Returns as a floating point value so that
+ * Finds the elapsed time in seconds. Returns as a floating point value so that
  * fractional times can be represented.
  *
  */

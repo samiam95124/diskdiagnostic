@@ -1,26 +1,37 @@
-//******************************************************************************
-//
-// Disc Drive diagnostic
-//
-// Linux I/O module
-//
-// Contains the Linux specific I/O functions and other support functions
-//
-// setdrive    - Set current physical access drive (and open it).
-// getdrive    - Get the current logical drive number.
-// readsector  - Read one or more sectors to a buffer.
-// writesector - Write one or more sectors to a buffer.
-// physize     - Get the size of the physical drive in lbas.
-// testsize    - Get the size of a physical drive in lbas, but takes drive as
-//               parameter.
-// closedrive  - Close current drive.
-// getdrvstr   - Gets the string corresponding to a given logical drive.
-// chkbrk      - check user break
-// gettim      - Get high resolution (64 bit) timer
-// elapsed     - Find elapsed time
-// initio      - Initializes this module
-//
-//******************************************************************************
+/** ***************************************************************************
+*
+* \file
+*
+* \brief Linux I/O module
+*
+* Contains Linux specific I/O functions.
+*
+* setdrive    - Set current physical access drive (and open it).
+*
+* getdrive    - Get the current logical drive number.
+*
+* readsector  - Read one or more sectors to a buffer.
+*
+* writesector - Write one or more sectors to a buffer.
+*
+* physize     - Get the size of the physical drive in lbas.
+*
+* testsize    - Get the size of a physical drive in lbas, but takes drive as
+*               parameter.
+*
+* closedrive  - Close current drive.
+*
+* getdrvstr   - Gets the string corresponding to a given logical drive.
+*
+* chkbrk      - check user break
+*
+* gettim      - Get high resolution (64 bit) timer
+*
+* elapsed     - Find elapsed time
+*
+* initio      - Initializes this module
+* 
+******************************************************************************/
 
 #include <stdio.h>
 #include <fcntl.h>

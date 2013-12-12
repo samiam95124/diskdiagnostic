@@ -1,31 +1,41 @@
-//******************************************************************************
-//
-// Disc Drive diagnostic
-//
-// Stub I/O Module
-//
-// Emulates a disc by reading and writing from an array. This is for the purpose
-// of bring up testing, and also helps when porting to a new platform. The
-// diagnostic can be compiled and run through complete tests without any real
-// real disk I/O taking place. This module is completely compatible with CLIB,
-// and so should port to any ANSI C installation.
-//
-// setdrive    - Set current physical access drive (and open it).
-// getdrive    - Get the current logical drive number.
-// readsector  - Read one or more sectors to a buffer.
-// writesector - Write one or more sectors to a buffer.
-// physize     - Get the size of the physical drive in lbas.
-// testsize    - Get the size of a physical drive in lbas, but takes drive as
-//               parameter.
-// closedrive  - Close current drive.
-// getdrvstr   - Gets the string corresponding to a given logical drive.
-// chkbrk      - check user break
-// gettim      - Get high resolution (64 bit) timer
-// elapsed     - Find elapsed time
-// initio      - Initializes this module
-// 
-//******************************************************************************
-
+/** ***************************************************************************
+*
+* \file
+*
+* \brief Stub I/O module
+*
+* Emulates a disc by reading and writing to and from an array. This is for the
+* purpose of bring up testing, and also helps when porting to a new platform. 
+* The diagnostic can be compiled and run through complete tests without any real
+* real disk I/O taking place. This module is completely compatible with CLIB,
+* and so should port to any ANSI C installation.
+*
+* setdrive    - Set current physical access drive (and open it).
+*
+* getdrive    - Get the current logical drive number.
+*
+* readsector  - Read one or more sectors to a buffer.
+*
+* writesector - Write one or more sectors to a buffer.
+*
+* physize     - Get the size of the physical drive in lbas.
+*
+* testsize    - Get the size of a physical drive in lbas, but takes drive as
+*               parameter.
+*
+* closedrive  - Close current drive.
+*
+* getdrvstr   - Gets the string corresponding to a given logical drive.
+*
+* chkbrk      - check user break
+*
+* gettim      - Get high resolution (64 bit) timer
+*
+* elapsed     - Find elapsed time
+*
+* initio      - Initializes this module
+* 
+******************************************************************************/
 #include <stdio.h>
 #include "discio.h"
 
