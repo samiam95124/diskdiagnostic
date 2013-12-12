@@ -23,10 +23,6 @@
 *
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
-* gettim      - Get high resolution (64 bit) timer
-*
-* elapsed     - Find elapsed time
-*
 * initio      - Initializes this module
 * 
 ******************************************************************************/
@@ -34,7 +30,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <time.h>
 #include <linux/fs.h>
 #include "discio.h"
 
@@ -52,8 +47,6 @@ int physize(long long *size);
 int testsize(int drive, long long *size);
 void closedrive(void);
 const char* getdrvstr(int drive);
-long long gettim(void);
-double elapsed(long long t);
 void initio(void);
 
 /**
@@ -379,47 +372,6 @@ const char* getdrvstr(int drive)
     if (drive >= 0 || drive <= 9) p = phystr[drive];
 
     return p;
-
-}
-
-/**
- *
- * Get high resolution timer
- *
- * Get current setting on high resolution timer.
- *
- */
-long long gettim(void)
-
-{
-
-    long long time;
-
-    time = clock();
-
-    return time;
-
-}
-
-/**
- *
- * Find elapsed time in seconds
- *
- * Finds the elapsed time in seconds. Returns as a floating point value so that
- * fractional times can be represented.
- *
- */
-double elapsed(
-    /** reference time */ long long t
-)
-
-{
-
-    double etim;
-
-    etim = (gettim()-t*1.0)/CLOCKS_PER_SEC;
-
-    return etim;
 
 }
 

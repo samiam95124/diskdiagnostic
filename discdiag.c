@@ -258,6 +258,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <signal.h>
+#include <time.h>
 #include "discio.h"
 
 #include <time.h>
@@ -763,6 +764,47 @@ int chkbrk(void)
     breakflag = 0; // clear any break
 
     return breakflags; // return state of user break
+
+}
+
+/**
+ *
+ * Get high resolution timer
+ *
+ * Get current setting on high resolution timer.
+ *
+ */
+long long gettim(void)
+
+{
+
+    long long time;
+
+    time = clock();
+
+    return time;
+
+}
+
+/**
+ *
+ * Find elapsed time in seconds
+ *
+ * Finds the elapsed time in seconds. Returns as a floating point value so that
+ * fractional times can be represented.
+ *
+ */
+double elapsed(
+    /** reference time */ long long t
+)
+
+{
+
+    double etim;
+
+    etim = (gettim()-t*1.0)/CLOCKS_PER_SEC;
+
+    return etim;
 
 }
 

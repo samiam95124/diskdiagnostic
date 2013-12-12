@@ -27,10 +27,6 @@
 *
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
-* gettim      - Get high resolution (64 bit) timer
-*
-* elapsed     - Find elapsed time
-*
 * initio      - Initializes this module
 * 
 ******************************************************************************/
@@ -335,41 +331,6 @@ void initim(void)
 {
 
     // not implemented
-
-}
-
-/**
- *
- * Get high resolution timer
- *
- * Get current setting on high resolution timer.
- *
- */
-long long gettim(void)
-
-{
-
-    // Not implemented
-    return 0ll;
-
-}
-
-/**
- *
- * Find elapsed time in seconds
- *
- * Finds the elapsed time in second. Returns as a floating point value so that
- * fractional times can be represented.
- *
- */
-double elapsed(
-    /** reference time */ long long t
-)
-
-{
-
-    // Not implemented
-    return 0.0;
 
 }
 
