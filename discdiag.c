@@ -2030,6 +2030,10 @@ result skipcmd(
     int forcnt; // nested for counter
     int selcnt; // nested select counter
 
+    whlcnt = 0; // clear nesting counts
+    repcnt = 0;
+    forcnt = 0;
+    selcnt = 0;
     // skip the rest of the command/parameters
     while (**line && **line != ';') (*line)++; // skip until ';' or end
     if (**line == ';') (*line)++; // skip ';'
@@ -2053,7 +2057,7 @@ result skipcmd(
                 if (!strcmp(w, "send"))   { selcnt--; if (selcnt < 0) selcnt = 0; }
                 // lock out nested sections. We treat excesss ends as no-ops,
                 // but at that point the algorithim is suspect in any case.
-                // It means the soure is playing games with the nesting.
+                // It means the source is playing games with the nesting.
                 if (!(whlcnt || repcnt || forcnt || selcnt)) {
 
                     // search for provided words
@@ -4458,7 +4462,7 @@ result command_go(
     }
     *line = p->line; // start new position
 
-    return result_ok; // return result ok
+    return result_restart; // return result ok, restart line
 
 }
 
