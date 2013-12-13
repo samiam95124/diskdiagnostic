@@ -104,6 +104,8 @@
 * exit                        - Exit diagnostic.
 *
 * exitonerror                 - Exit the diagnostic on error.
+*
+* i, input var                - Input value from user.
 * 
 * [option] Means an optional parameter.
 *
@@ -494,6 +496,7 @@ result command_testrand(char **line);
 result command_listvariables(char **line);
 result command_exit(char **line);
 result command_exitonerror(char **line);
+result command_input(char **line);
 
 /**
  *
@@ -560,6 +563,8 @@ command cmdtbl[] = {
     /** if conditional       */      { "if",            command_if },
     /** Exit diagnostic      */      { "exit",          command_exit },
     /** Exit diagnostic on error */  { "exitonerror",   command_exitonerror },
+    /** Input value */               { "i",             command_input },
+                                     { "input",         command_input },
    
     /* Hidden test commands for the diagnostic */
 
@@ -1222,7 +1227,7 @@ result getval(
 
     } else if (isdigit(*w)) {
 
-        // Note Mickeysoft does not support strtoull
+        // Note Microsoft does not support strtoull
         *n = (long long)strtoul(w, NULL, 0); // return resulting number
 
     } else {
@@ -4117,6 +4122,54 @@ result command_set(
 
 /**
  *
+ * Input user variable
+ *
+ * Inputs either a new user variable or resets an existing one.
+ *
+ * \returns Standard discdiag error code.
+ * 
+ */
+
+result command_input(
+    /** Remaining command line */ char **line
+)
+
+{
+
+    char linebuffer[250]; // Holder for input line
+    char w[100]; // buffer for parameter
+    uservar *uvar; // pointer to user variable entry
+    long long v;
+    result r;
+
+    getword(line, w); // get name of variable
+    // get value for variable from user
+    
+    
+    // input line from user
+    readline(stdin, linebuffer, sizeof(linebuffer));
+    v = strtoul(linebuffer, NULL, 0); // find number
+    
+    // try searching the user variables list
+    uvar = fndvar(w);
+    if (uvar) { // found
+
+        // place value of variable
+        uvar->val = v;
+
+    } else { // not found
+
+        r = pushvar(w, v); // enter new variable
+        if (r != result_ok) return r; // error
+
+    }
+
+    return result_ok; // return result ok
+
+}
+
+/**
+ *
  * Local variable
  *
  * Creates a new variable as a local. This is sometimes required in a procedure
@@ -4712,7 +4765,7 @@ int main(
     double time;
     int error_result;
 
-    printf("Disc Diagnostic 2.0.1\n");
+    printf("Disc Diagnostic 2.0.2\n");
     printf("\n");
     printf("Enter ? or Help for command list\n");
     printf("\n");
