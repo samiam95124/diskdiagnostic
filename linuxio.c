@@ -19,8 +19,6 @@
 * testsize    - Get the size of a physical drive in lbas, but takes drive as
 *               parameter.
 *
-* closedrive  - Close current drive.
-*
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
 * initio      - Initializes this module
@@ -47,7 +45,6 @@ int readsector(unsigned char *buffer, long long lba, long long numsec);
 int writesector(unsigned char *buffer, long long lba, long long numsec);
 int physize(long long *size);
 int testsize(int drive, long long *size);
-void closedrive(void);
 const char* getdrvstr(int drive);
 void initio(void);
 void deinitio(void);
