@@ -41,11 +41,11 @@ int readsector(unsigned char *buffer, long long lba, long long numsec);
 int writesector(unsigned char *buffer, long long lba, long long numsec);
 int physize(long long *size);
 int testsize(int drive, long long *size);
-void closedrive(void);
 const char* getdrvstr(int drive);
 int chkbrk(void);
 long long gettim(void);
 double elapsed(long long t);
 void initio(void);
+void deinitio(void);
 
 #endif

@@ -23,7 +23,9 @@
 *
 * getdrvstr   - Gets the string corresponding to a given logical drive.
 *
-* initio      - Initializes this module
+* initio      - Initializes this module.
+*
+* deinitio    - Deinitializes this module.
 * 
 ******************************************************************************/
 
@@ -32,9 +34,9 @@
 #include <winioctl.h>
 #include "discio.h"
 
-/**
+/*
  *
- * Exported functons declarations
+ * Exported functions declarations
  *
  */
 int setdrive(int drive);
@@ -44,9 +46,16 @@ int readsector(unsigned char *buffer, long long lba, long long numsec);
 int writesector(unsigned char *buffer, long long lba, long long numsec);
 int physize(long long *size);
 int testsize(int drive, long long *size);
-void closedrive(void);
 const char* getdrvstr(int drive);
 void initio(void);
+void deinitio(void);
+
+/*
+ *
+ * Internal functions declarations
+ *
+ */
+static void closedrive(void);
 
 /**
  *
@@ -87,22 +96,6 @@ static HANDLE phydriveh;
 
 /**
  *
- * Break flag
- *
- * Indicates ctl-c was hit on the console.
- *
- */
-static int breakflag;
-
-/**
- *
- * Windows ticks per second for high resolution timer
- *
- */
-LARGE_INTEGER frequency;
-
-/**
- *
  * Set physical drive
  *
  * Sets the physical drive by logical number.
@@ -122,6 +115,8 @@ int setdrive(
 
     }
 
+    closedrive(); // close any active drive
+    
     // set logical drive
     phydrive = drive;
 
@@ -416,7 +411,7 @@ int testsize(
  * Closes the physical disk prior to exiting the diagnostic.
  *
  */
-void closedrive(void)
+static void closedrive(void)
 
 {
 
@@ -472,3 +467,17 @@ void initio(void)
 
 }
  
+/**
+ *
+ * Deinitialize I/O package
+ *
+ * Tears down this package.
+ *
+ */
+void deinitio(void)
+
+{
+
+    closedrive(); // close any active drive
+
+} 

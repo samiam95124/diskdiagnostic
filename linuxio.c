@@ -25,6 +25,8 @@
 *
 * initio      - Initializes this module
 * 
+* deinitio    - Deinitializes this module.
+*
 ******************************************************************************/
 
 #include <stdio.h>
@@ -48,6 +50,14 @@ int testsize(int drive, long long *size);
 void closedrive(void);
 const char* getdrvstr(int drive);
 void initio(void);
+void deinitio(void);
+
+/*
+ *
+ * Internal functions declarations
+ *
+ */
+static void closedrive(void);
 
 /**
  *
@@ -113,6 +123,8 @@ int setdrive(
         return 1;
 
     }
+
+    closedrive(); // close any active drive
 
     // set logical drive
     phydrive = drive;
@@ -339,7 +351,7 @@ int testsize(
  * Closes the physical disk prior to exiting the diagnostic.
  *
  */
-void closedrive(void)
+static void closedrive(void)
 
 {
 
@@ -392,4 +404,19 @@ void initio(void)
     phydrive = -1; // set no drive is active
 
 }
+
+/**
+ *
+ * Deinitialize I/O package
+ *
+ * Tears down this package.
+ *
+ */
+void deinitio(void)
+
+{
+
+    closedrive(); // close any active drive
+
+} 
  

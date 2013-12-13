@@ -3163,7 +3163,6 @@ result command_drive(
         drive = (int) v;
         writeprot = 1; // set the write protect on the new drive by default
         if (!drive) printf("*** Warning: You have selected the system drive\n");
-        closedrive(); // close current drive (if any)
         ri = setdrive(drive); // set physical drive active
         if (ri) return result_error; // error
         currentdrive = drive; // set that active
@@ -4902,8 +4901,8 @@ int main(
 
     exit:// exit diagnostic
 
-    // close physical disk
-    closedrive();
+    // deinitialize I/O package
+    deinitio();
 
     // exit with the last command result
     return error_result;
