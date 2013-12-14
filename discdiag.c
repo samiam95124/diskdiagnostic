@@ -73,7 +73,7 @@
 *
 * select val                  - Select value, match successive cases for val.
 *
-* case val                    - Start new select case.
+* case val...                 - Start new select case.
 *
 * default                     - Start select case matching any value.
 *
@@ -3839,6 +3839,7 @@ result command_select(
     int what;
     int found;
     result r;
+    char c;
 
     // get selector value
     r = getparam(line, &v);
@@ -3851,10 +3852,15 @@ result command_select(
         if (r != result_ok) return r;
         if (what == 1) { // process case match
 
-            // get match value
-            r = getparam(line, &m);
-            if (r != result_ok) return r;
-            found = v == m; // set found status
+            do { // examine each presented case
+            
+                // get match value
+                r = getparam(line, &m);
+                if (r != result_ok) return r;
+                if (v == m) found = 1; // set found status
+                while (**line == ' ') (*line)++; // skip any spaces
+                
+            } while (**line && **line != ';'); // not end of command
      
         } else if (what == 2) found = 1; // default matches all      
 
