@@ -949,7 +949,9 @@ result dump(
 {
 
     int i, x, b;
+    result r;
 
+    r = result_ok; // set result code ok
     linecounter = 0; // reset screen line counter
     for (b = x = i = 0; i < size; i++) {
 
@@ -968,7 +970,12 @@ result dump(
             }
             printf("\"\n");
             pause();
-            if (chkbrk()) goto stop; // stop on break
+            if (chkbrk()) {
+            
+                if (exiterror) r = result_exit; // exit diagnostic
+                goto stop; // stop on break
+                
+            }
             b = 0; // clear byte count
             if (chkbrk()) return result_stop; // check break
 
@@ -992,7 +999,7 @@ result dump(
     }
     stop:
   
-    return result_ok; // exist ok
+    return r; // exit with result code
 
 }
 
@@ -1549,6 +1556,9 @@ result printcomp(
 
 {
 
+    result r;
+    
+    r = result_ok; // set result code ok
     if (nb != ob) {
 
         // check is first miscompare or mode is print all
@@ -1585,9 +1595,14 @@ result printcomp(
         dataset = 1;
 
     }
-    if (chkbrk()) return result_stop; // check break
+    if (chkbrk()) {
+    
+        if (exiterror) r = result_exit; // exit diagnostic
+        else r = result_stop; // check break
+        
+    }
 
-    return result_ok;
+    return r; // return result code
 
 }
 
@@ -4147,30 +4162,36 @@ result command_input(
     uservar *uvar; // pointer to user variable entry
     long long v;
     result r;
+    int b;
 
+    r = result_ok; // set result ok
     getword(line, w); // get name of variable
     // get value for variable from user
+    b = readline(stdin, linebuffer, sizeof(linebuffer));
+    if (chkbrk() || b) {
+        
+        if (exiterror) r = result_exit; // exit diagnostic
+        
+    } else {
     
+        v = strtoul(linebuffer, NULL, 0); // find number
     
-    // input line from user
-    readline(stdin, linebuffer, sizeof(linebuffer));
-    v = strtoul(linebuffer, NULL, 0); // find number
-    
-    // try searching the user variables list
-    uvar = fndvar(w);
-    if (uvar) { // found
+        // try searching the user variables list
+        uvar = fndvar(w);
+        if (uvar) { // found
 
-        // place value of variable
-        uvar->val = v;
+            // place value of variable
+            uvar->val = v;
 
-    } else { // not found
+        } else { // not found
 
-        r = pushvar(w, v); // enter new variable
-        if (r != result_ok) return r; // error
+            r = pushvar(w, v); // enter new variable
 
+        }
+        
     }
 
-    return result_ok; // return result ok
+    return r; // return result
 
 }
 
@@ -4250,46 +4271,59 @@ result command_list(
     int n;
     uservar *up;
     int lc;
+    int bk;
+    result r;
 
     printf("\n");
     printf("Program store:\n");
     printf("\n");
+    r = result_ok; // set ok result code
+    bk = 0; // clear break flag
     p = editroot; // index first line
     n = 1; // set 1st line
     linecounter = 0; // set 1st line on screen
-    while (p && !chkbrk()) { // traverse and print
+    while (p && !bk) { // traverse and print
  
-        if (p->label) { // there is a line label
+        if (chkbrk()) {
+        
+            if (exiterror) r = result_exit; // exit diagnostic
+            bk = 1; // set break
+            
+        } else {
+        
+            if (p->label) { // there is a line label
 
-            up = p->params; // index parameters list
-            printf("%d: %s", n, p->label);
-            if (up) { // there are parameters
+                up = p->params; // index parameters list
+                printf("%d: %s", n, p->label);
+                if (up) { // there are parameters
 
-                printf("(");
-                while (up) {
+                    printf("(");
+                    while (up) {
 
-                    printf("%s", up->varstr);
-                    if (up->next) printf(" ");
-                    up = up->next; // next parameter
+                        printf("%s", up->varstr);
+                        if (up->next) printf(" ");
+                        up = up->next; // next parameter
+
+                    }
+                    printf(")");
 
                 }
-                printf(")");
+                printf(": %s\n", p->line);
+
+            } else {
+
+                printf("%d: %s\n", n, p->line);
 
             }
-            printf(": %s\n", p->line);
-
-        } else {
-
-            printf("%d: %s\n", n, p->line);
-
+            p = p->next; // go next line in list
+            n++; // count
+            pause(); // pause on screen full
+            
         }
-        p = p->next; // go next line in list
-        n++; // count
-        pause(); // pause on screen full
 
     }
 
-    return result_ok; // return result ok
+    return r; // return result ok
 
 }
 
@@ -4877,6 +4911,7 @@ int main(
         if (chkbrk()) {
 
             printf("\n"); // space off unfinished line
+            if (exiterror) goto exit; // exit diagnostic
             goto nxtlin; // check break
 
         }
@@ -4918,7 +4953,12 @@ int main(
                             else goto nxtlin; // go fetch next line
 
                         }
-                        if (chkbrk()) goto nxtlin; // check break
+                        if (chkbrk()) { // check break
+                        
+                            if (exiterror) goto exit; // exit diagnostic
+                            goto nxtlin; // return to command entry
+                            
+                        }
                         while (*linep == ' ') linep++; // skip spaces
                         // if comment, go next line
                         if (*linep == '!') goto nxtpgm;
