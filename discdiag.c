@@ -4805,7 +4805,7 @@ int main(
     double time;
     int error_result;
 
-    printf("Disc Diagnostic 2.0.2\n");
+    printf("Disc Diagnostic 2.1\n");
     printf("\n");
     printf("Enter ? or Help for command list\n");
     printf("\n");
