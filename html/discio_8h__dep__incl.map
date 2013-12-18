@@ -1,0 +1,7 @@
+<map id="discio.h" name="discio.h">
+<area shape="rect" href="$discdiag_8c.html" title="This file contains the main diagnostic code. " alt="" coords="5,80,85,107"/>
+<area shape="rect" href="$dosio_8c.html" title="DOS I/O module. " alt="" coords="109,80,173,107"/>
+<area shape="rect" href="$linuxio_8c.html" title="Linux I/O module. " alt="" coords="197,80,267,107"/>
+<area shape="rect" href="$stubio_8c.html" title="Stub I/O module. " alt="" coords="291,80,357,107"/>
+<area shape="rect" href="$winio_8c.html" title="Windows I/O module. " alt="" coords="381,80,443,107"/>
+</map>

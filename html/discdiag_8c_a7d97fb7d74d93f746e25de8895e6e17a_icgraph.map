@@ -1,0 +1,7 @@
+<map id="pause" name="pause">
+<area shape="rect" href="$discdiag_8c.html#a24febc49fe1ed5aa9cd283fcff994093" title="dump" alt="" coords="141,31,195,57"/>
+<area shape="rect" href="$discdiag_8c.html#a7489eda17de1ba6b5d239373a1f068a6" title="command_help" alt="" coords="112,81,224,108"/>
+<area shape="rect" href="$discdiag_8c.html#ac366bee58c0b0316636298ef52f6da42" title="command_list" alt="" coords="116,132,220,159"/>
+<area shape="rect" href="$discdiag_8c.html#a4d69fc47a299e27e09167436e57b0c5e" title="command_dumpwrite" alt="" coords="272,5,421,32"/>
+<area shape="rect" href="$discdiag_8c.html#a3c32692314ff853d293a0bce9a5c5add" title="command_dumpread" alt="" coords="273,56,420,83"/>
+</map>

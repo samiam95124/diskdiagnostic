@@ -1,0 +1,8 @@
+<map id="getfact" name="getfact">
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="115,19,192,45"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="125,81,181,108"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="244,5,305,32"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="359,81,423,108"/>
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="240,56,309,83"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="245,107,304,133"/>
+</map>

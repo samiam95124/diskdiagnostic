@@ -1,0 +1,28 @@
+<map id="getfact" name="getfact">
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="116,487,180,513"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="231,487,292,513"/>
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="341,512,419,539"/>
+<area shape="rect" href="$discdiag_8c.html#a93cd3b819da5ba6c14a4316c3ba518dc" title="command_read" alt="" coords="485,5,597,32"/>
+<area shape="rect" href="$discdiag_8c.html#ac227010a6ab11bd43846fbda8a60ff1e" title="command_write" alt="" coords="484,56,599,83"/>
+<area shape="rect" href="$discdiag_8c.html#a4d69fc47a299e27e09167436e57b0c5e" title="command_dumpwrite" alt="" coords="467,107,616,133"/>
+<area shape="rect" href="$discdiag_8c.html#a3c32692314ff853d293a0bce9a5c5add" title="command_dumpread" alt="" coords="468,157,615,184"/>
+<area shape="rect" href="$discdiag_8c.html#af4943f72a2a1a14dc434d42da0bcdb25" title="command_pattn" alt="" coords="483,208,600,235"/>
+<area shape="rect" href="$discdiag_8c.html#ad22e8be0ba3c338bbd1a84c3b7f56e02" title="command_comp" alt="" coords="481,259,601,285"/>
+<area shape="rect" href="$discdiag_8c.html#a976395a9cf6e72eee8616609a6f28c18" title="command_drive" alt="" coords="484,309,599,336"/>
+<area shape="rect" href="$discdiag_8c.html#a101a42dd43a864fa0c82f08d64930076" title="command_loop" alt="" coords="485,360,597,387"/>
+<area shape="rect" href="$discdiag_8c.html#a68fb4bb6e4c0d373669ac54e59f5e277" title="command_loopq" alt="" coords="481,411,601,437"/>
+<area shape="rect" href="$discdiag_8c.html#afb0169cb08b96b06f79ec66dbdae2b4e" title="command_untill" alt="" coords="484,461,599,488"/>
+<area shape="rect" href="$discdiag_8c.html#adb0fd5314142edbd7209b416c705c9ab" title="command_while" alt="" coords="483,512,600,539"/>
+<area shape="rect" href="$discdiag_8c.html#aa06fe1e746beac62c7a95a1f5fa32826" title="command_wend" alt="" coords="483,563,600,589"/>
+<area shape="rect" href="$discdiag_8c.html#aa56cb5c874376feb1e131a36b246fa0c" title="command_until" alt="" coords="485,613,597,640"/>
+<area shape="rect" href="$discdiag_8c.html#a178ce50643c51866b6217eb2c9424cd4" title="command_for" alt="" coords="491,664,592,691"/>
+<area shape="rect" href="$discdiag_8c.html#ae88f194762c599caf46b397935f49b9d" title="command_fend" alt="" coords="485,715,597,741"/>
+<area shape="rect" href="$discdiag_8c.html#a2dcb2c3c46a5dda3e6623d69abda4a53" title="command_select" alt="" coords="480,765,603,792"/>
+<area shape="rect" href="$discdiag_8c.html#a98ab33da300cd689c8436282bd0b4ecf" title="command_printn" alt="" coords="481,816,601,843"/>
+<area shape="rect" href="$discdiag_8c.html#a894baf1497ca2d7a46e1541897671c43" title="command_set" alt="" coords="489,867,593,893"/>
+<area shape="rect" href="$discdiag_8c.html#af96d8b48439c90eea8d525e788976060" title="command_delt" alt="" coords="487,917,596,944"/>
+<area shape="rect" href="$discdiag_8c.html#aa92ac8d02315042cbe5bab1d5341d5e6" title="command_if" alt="" coords="495,968,588,995"/>
+<area shape="rect" href="$discdiag_8c.html#a19a1df6dc62aeac7b2cf6818b70efa45" title="exec" alt="" coords="517,1019,565,1045"/>
+<area shape="rect" href="$discdiag_8c.html#adaa72c96bf1e1be57a7968e1b2943a1d" title="command_print" alt="" coords="665,816,777,843"/>
+<area shape="rect" href="$discdiag_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="696,1019,747,1045"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="command_dumpwrite" name="command_dumpwrite">
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="203,56,280,83"/>
+<area shape="rect" href="$discdiag_8c.html#a24febc49fe1ed5aa9cd283fcff994093" title="dump" alt="" coords="215,107,268,133"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="329,5,391,32"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="441,5,505,32"/>
+<area shape="rect" href="$discdiag_8c.html#a5ca5314be78308c75f0fb330a0b255dc" title="getfact" alt="" coords="555,31,616,57"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="665,31,721,57"/>
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="771,5,840,32"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="776,56,835,83"/>
+<area shape="rect" href="$discdiag_8c.html#a7d97fb7d74d93f746e25de8895e6e17a" title="pause" alt="" coords="332,107,388,133"/>
+<area shape="rect" href="$discdiag_8c.html#a9ef00d4367fd535c855634cc75cdc9fa" title="chkbrk" alt="" coords="331,157,389,184"/>
+</map>

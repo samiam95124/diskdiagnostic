@@ -1,0 +1,10 @@
+<map id="command_set" name="command_set">
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="728,37,797,64"/>
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="160,93,237,120"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="733,100,792,127"/>
+<area shape="rect" href="$discdiag_8c.html#ac0967519adb4895d0001b59eae9fee11" title="pushvar" alt="" coords="164,195,233,221"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="287,43,348,69"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="399,43,463,69"/>
+<area shape="rect" href="$discdiag_8c.html#a5ca5314be78308c75f0fb330a0b255dc" title="getfact" alt="" coords="512,68,573,95"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="623,68,679,95"/>
+</map>

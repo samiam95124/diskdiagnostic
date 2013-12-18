@@ -1,0 +1,7 @@
+<map id="command_input" name="command_input">
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="171,5,240,32"/>
+<area shape="rect" href="$discdiag_8c.html#a8bdf88885b41be5ffcc780b8b68b232b" title="readline" alt="" coords="171,56,240,83"/>
+<area shape="rect" href="$discdiag_8c.html#a9ef00d4367fd535c855634cc75cdc9fa" title="chkbrk" alt="" coords="176,107,235,133"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="176,157,235,184"/>
+<area shape="rect" href="$discdiag_8c.html#ac0967519adb4895d0001b59eae9fee11" title="pushvar" alt="" coords="171,208,240,235"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="command_drive" name="command_drive">
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="171,31,248,57"/>
+<area shape="rect" href="$discio_8h.html#a16626269f13eb0e2f64697b87fd00e21" title="setdrive" alt="" coords="176,81,243,108"/>
+<area shape="rect" href="$discio_8h.html#a35b96a39a42a0833d3d527b4781364d7" title="physize" alt="" coords="176,132,243,159"/>
+<area shape="rect" href="$discio_8h.html#a5e4a8d72a7f09af71e98f4735c2cbc9b" title="getdrive" alt="" coords="175,183,244,209"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="297,5,359,32"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="409,5,473,32"/>
+<area shape="rect" href="$discdiag_8c.html#a5ca5314be78308c75f0fb330a0b255dc" title="getfact" alt="" coords="523,31,584,57"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="633,31,689,57"/>
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="739,5,808,32"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="744,56,803,83"/>
+</map>

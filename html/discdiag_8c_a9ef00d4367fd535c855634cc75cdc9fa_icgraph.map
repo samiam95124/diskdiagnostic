@@ -1,0 +1,10 @@
+<map id="chkbrk" name="chkbrk">
+<area shape="rect" href="$discdiag_8c.html#a24febc49fe1ed5aa9cd283fcff994093" title="dump" alt="" coords="147,56,200,83"/>
+<area shape="rect" href="$discdiag_8c.html#ae6ecda18c3ceedc5ba580707e6ac1fc5" title="printcomp" alt="" coords="133,107,213,133"/>
+<area shape="rect" href="$discdiag_8c.html#a593aee4e3d0827517cd1080ee36c3c9c" title="command_input" alt="" coords="116,157,231,184"/>
+<area shape="rect" href="$discdiag_8c.html#ac366bee58c0b0316636298ef52f6da42" title="command_list" alt="" coords="121,208,225,235"/>
+<area shape="rect" href="$discdiag_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="148,259,199,285"/>
+<area shape="rect" href="$discdiag_8c.html#a4d69fc47a299e27e09167436e57b0c5e" title="command_dumpwrite" alt="" coords="280,5,429,32"/>
+<area shape="rect" href="$discdiag_8c.html#a3c32692314ff853d293a0bce9a5c5add" title="command_dumpread" alt="" coords="281,56,428,83"/>
+<area shape="rect" href="$discdiag_8c.html#ad22e8be0ba3c338bbd1a84c3b7f56e02" title="command_comp" alt="" coords="295,107,415,133"/>
+</map>

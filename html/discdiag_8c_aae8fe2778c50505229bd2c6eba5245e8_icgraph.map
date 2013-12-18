@@ -1,0 +1,7 @@
+<map id="skipcmd" name="skipcmd">
+<area shape="rect" href="$discdiag_8c.html#adb0fd5314142edbd7209b416c705c9ab" title="command_while" alt="" coords="131,5,248,32"/>
+<area shape="rect" href="$discdiag_8c.html#a178ce50643c51866b6217eb2c9424cd4" title="command_for" alt="" coords="139,56,240,83"/>
+<area shape="rect" href="$discdiag_8c.html#a2dcb2c3c46a5dda3e6623d69abda4a53" title="command_select" alt="" coords="128,107,251,133"/>
+<area shape="rect" href="$discdiag_8c.html#a3148db74a214f75aa1eb333623a7e0b9" title="command_case" alt="" coords="132,157,247,184"/>
+<area shape="rect" href="$discdiag_8c.html#ab3342787d346f05f334e0d21e84b10c9" title="command_default" alt="" coords="127,208,252,235"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="rand32" name="rand32">
+<area shape="rect" href="$discdiag_8c.html#a8d09c21f6c3df5e7b749850028d38656" title="rand64" alt="" coords="119,107,180,133"/>
+<area shape="rect" href="$discdiag_8c.html#aad871abb138bc760fb27dd7b5e11e397" title="variable_rand" alt="" coords="247,5,348,32"/>
+<area shape="rect" href="$discdiag_8c.html#a8e3e9d3556b013f2148765d75e97520d" title="variable_lbarnd" alt="" coords="241,56,353,83"/>
+<area shape="rect" href="$discdiag_8c.html#af4943f72a2a1a14dc434d42da0bcdb25" title="command_pattn" alt="" coords="239,107,356,133"/>
+<area shape="rect" href="$discdiag_8c.html#ad22e8be0ba3c338bbd1a84c3b7f56e02" title="command_comp" alt="" coords="237,157,357,184"/>
+<area shape="rect" href="$discdiag_8c.html#aec549b80a0cf798b17a52c4573dcaab5" title="command_testrand" alt="" coords="229,208,365,235"/>
+</map>

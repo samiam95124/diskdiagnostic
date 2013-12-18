@@ -1,0 +1,11 @@
+<map id="poplvl" name="poplvl">
+<area shape="rect" href="$discdiag_8c.html#aae8fe2778c50505229bd2c6eba5245e8" title="skipcmd" alt="" coords="132,107,201,133"/>
+<area shape="rect" href="$discdiag_8c.html#afb0169cb08b96b06f79ec66dbdae2b4e" title="command_untill" alt="" coords="109,157,224,184"/>
+<area shape="rect" href="$discdiag_8c.html#aea5e0f9924299cc10a6dd1bb5e56f0a4" title="command_end" alt="" coords="112,208,221,235"/>
+<area shape="rect" href="$discdiag_8c.html#a0ddf1224851353fc92bfbff6f499fa97" title="main" alt="" coords="141,259,192,285"/>
+<area shape="rect" href="$discdiag_8c.html#adb0fd5314142edbd7209b416c705c9ab" title="command_while" alt="" coords="277,5,395,32"/>
+<area shape="rect" href="$discdiag_8c.html#a178ce50643c51866b6217eb2c9424cd4" title="command_for" alt="" coords="285,56,387,83"/>
+<area shape="rect" href="$discdiag_8c.html#a2dcb2c3c46a5dda3e6623d69abda4a53" title="command_select" alt="" coords="275,107,397,133"/>
+<area shape="rect" href="$discdiag_8c.html#a3148db74a214f75aa1eb333623a7e0b9" title="command_case" alt="" coords="279,157,393,184"/>
+<area shape="rect" href="$discdiag_8c.html#ab3342787d346f05f334e0d21e84b10c9" title="command_default" alt="" coords="273,208,399,235"/>
+</map>

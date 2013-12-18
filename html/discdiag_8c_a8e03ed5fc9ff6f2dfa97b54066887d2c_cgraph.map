@@ -1,0 +1,5 @@
+<map id="command_listdrives" name="command_listdrives">
+<area shape="rect" href="$discio_8h.html#a30b765e85a27f3225c41bb6149b54334" title="testdrive" alt="" coords="193,5,265,32"/>
+<area shape="rect" href="$discio_8h.html#a8802d640aa2412b24c1f63ed78d99f0e" title="testsize" alt="" coords="196,56,263,83"/>
+<area shape="rect" href="$discio_8h.html#a5c28d291a3030c36320e1d5aa847a8fd" title="getdrvstr" alt="" coords="193,107,265,133"/>
+</map>

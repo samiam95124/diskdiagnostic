@@ -1,0 +1,27 @@
+<map id="main" name="main">
+<area shape="rect" href="$discio_8h.html#ae140132a72c755235914dd180814d2ba" title="initio" alt="" coords="131,5,179,32"/>
+<area shape="rect" href="$discdiag_8c.html#a4b86f321ff4c3dc1dda11b083238d962" title="ctlchandler" alt="" coords="112,56,197,83"/>
+<area shape="rect" href="$discdiag_8c.html#a7f909ff135d6975eabda690fa497c8cb" title="loadfile" alt="" coords="123,233,187,260"/>
+<area shape="rect" href="$discdiag_8c.html#a8bdf88885b41be5ffcc780b8b68b232b" title="readline" alt="" coords="261,157,331,184"/>
+<area shape="rect" href="$discdiag_8c.html#a47603eb2a6e11f330171cf6303de52e2" title="enterline" alt="" coords="387,233,459,260"/>
+<area shape="rect" href="$discdiag_8c.html#a0571f239b0bb059f62719a00509e6744" title="pushlvl" alt="" coords="265,461,327,488"/>
+<area shape="rect" href="$discdiag_8c.html#a556b09b57d2bc28161e13e499c561c16" title="rstlin" alt="" coords="131,487,179,513"/>
+<area shape="rect" href="$discdiag_8c.html#acb39d5eea84b963d22a34dae22acf420" title="fndpgm" alt="" coords="264,512,328,539"/>
+<area shape="rect" href="$discdiag_8c.html#a64547ac24a3c852fda7918427562ddd5" title="gettim" alt="" coords="268,576,324,603"/>
+<area shape="rect" href="$discdiag_8c.html#a8e338bf2897d2e612ab1db4d734f1e39" title="elapsed" alt="" coords="121,537,188,564"/>
+<area shape="rect" href="$discdiag_8c.html#ad47cbcf689c1ac182bf8e496e77e66eb" title="printscpersec" alt="" coords="105,639,204,665"/>
+<area shape="rect" href="$discdiag_8c.html#a9ef00d4367fd535c855634cc75cdc9fa" title="chkbrk" alt="" coords="125,689,184,716"/>
+<area shape="rect" href="$discdiag_8c.html#a19a1df6dc62aeac7b2cf6818b70efa45" title="exec" alt="" coords="131,335,179,361"/>
+<area shape="rect" href="$discdiag_8c.html#ad77922a20cb89346b2aa97fbabcc0d6d" title="poplvl" alt="" coords="127,740,183,767"/>
+<area shape="rect" href="$discio_8h.html#a74ebac4c12905070dca23a6fd0e0e873" title="deinitio" alt="" coords="123,791,187,817"/>
+<area shape="rect" href="$discdiag_8c.html#abcc0728c0fee2f274dd25a6bb4ef3ca2" title="clrpgm" alt="" coords="265,208,327,235"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="732,208,788,235"/>
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="837,259,907,285"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="843,208,901,235"/>
+<area shape="rect" href="$discdiag_8c.html#adeb55a164ffcd598aa92939c2e838fcf" title="printscaled" alt="" coords="253,639,339,665"/>
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="257,309,335,336"/>
+<area shape="rect" href="$discdiag_8c.html#ac0967519adb4895d0001b59eae9fee11" title="pushvar" alt="" coords="261,360,331,387"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="392,360,453,387"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="508,360,572,387"/>
+<area shape="rect" href="$discdiag_8c.html#a5ca5314be78308c75f0fb330a0b255dc" title="getfact" alt="" coords="621,309,683,336"/>
+</map>

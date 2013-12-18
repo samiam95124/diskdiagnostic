@@ -1,0 +1,11 @@
+<map id="command_pattn" name="command_pattn">
+<area shape="rect" href="$discdiag_8c.html#a8b5f2b8b88a6263320854b4df5e2e320" title="getword" alt="" coords="739,5,808,32"/>
+<area shape="rect" href="$discdiag_8c.html#a5900cbf82ffb703466fcb2374da3fb2b" title="getparam" alt="" coords="171,68,248,95"/>
+<area shape="rect" href="$discdiag_8c.html#a8d09c21f6c3df5e7b749850028d38656" title="rand64" alt="" coords="179,144,240,171"/>
+<area shape="rect" href="$discdiag_8c.html#a07e1cfbaf1fe14074688f8e8bdd22a6d" title="getadd" alt="" coords="297,56,359,83"/>
+<area shape="rect" href="$discdiag_8c.html#a2ca73ea1b50a99b1ca4a351f48f80eff" title="getmult" alt="" coords="409,56,473,83"/>
+<area shape="rect" href="$discdiag_8c.html#a5ca5314be78308c75f0fb330a0b255dc" title="getfact" alt="" coords="523,56,584,83"/>
+<area shape="rect" href="$discdiag_8c.html#a8829c94cad2f3500349e1661ce9ae26d" title="getval" alt="" coords="633,56,689,83"/>
+<area shape="rect" href="$discdiag_8c.html#a94545096f06c299eda5a54921685f8f2" title="fndvar" alt="" coords="744,56,803,83"/>
+<area shape="rect" href="$discdiag_8c.html#a4042bcb5ae8a91da621b8edac8a01cfc" title="rand32" alt="" coords="297,157,359,184"/>
+</map>
